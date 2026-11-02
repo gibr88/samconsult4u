@@ -7220,11 +7220,16 @@ PCTr2OIuwo5rOI1UFT3lNJff8sz8JU+DholReztNqMsY6bQhYSva9WU=
       sendBtn.textContent = 'Message sent';
       status.textContent = 'Thank you. Your message was sent to SAM, and we will be in touch soon.';
       setTimeout(function () { sendBtn.disabled = false; sendBtn.textContent = 'Send message'; }, 4000);
-    }).catch(function () {
+    }).catch(function (err) {
       sendBtn.disabled = false;
       sendBtn.textContent = 'Send message';
       status.innerHTML = '';
-      status.append('Your message could not be sent right now. ');
+      var reason = err && err.message && err.message !== 'Send failed' && err.message !== 'Failed to fetch' ? err.message : '';
+      if (/activat/i.test(reason)) {
+        status.textContent = 'This form is waiting to be activated. SAM has been sent an activation email; please try again shortly or email ' + CONTACT_EMAIL + ' directly.';
+        return;
+      }
+      status.append('Your message could not be sent right now' + (reason ? ' (' + reason + ')' : '') + '. ');
       var a = document.createElement('a');
       a.href = mailtoFallback(d);
       a.textContent = 'Email it to ' + CONTACT_EMAIL + ' instead';
